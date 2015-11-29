@@ -47,6 +47,20 @@ QMutex QcApplication::_mutex;
 #include <X11/Xlib.h>
 #endif
 
+/* on x11, we need to check, if we can actually connect to the X server */
+bool QtColliderUseGui(void)
+{
+#ifdef SC_USE_X11
+  Display *dpy = XOpenDisplay(NULL);
+  if (!dpy)
+    return false;
+  XCloseDisplay(dpy);
+  return true;
+#else
+  return true;
+#endif
+}
+
 // undefine some interfering X11 definitions
 #undef KeyPress
 
