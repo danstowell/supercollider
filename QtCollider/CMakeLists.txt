@@ -14,6 +14,7 @@ find_package(Qt5Quick)
 find_package(Qt5Qml)
 find_package(Qt5Sql)
 find_package(Qt5Positioning)
+find_package(Qt5X11Extras)
 
 set (QT_COLLIDER_LIBS
   Qt5::Core Qt5::Gui Qt5::Widgets Qt5::Network Qt5::WebKit Qt5::WebKitWidgets Qt5::PrintSupport
@@ -167,6 +168,6 @@ endif()
 if(CMAKE_SYSTEM_NAME MATCHES "Linux")
     find_package(X11 REQUIRED)
     include_directories(X11_INCLUDE_DIR)
-    list(APPEND QT_COLLIDER_LIBS ${X11_X11_LIB})
+    list(APPEND QT_COLLIDER_LIBS Qt5::X11Extras ${X11_X11_LIB})
     add_definitions(-DSC_USE_X11)
 endif()
