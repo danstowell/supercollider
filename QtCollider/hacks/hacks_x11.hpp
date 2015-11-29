@@ -26,7 +26,7 @@
 
 #include <QtGlobal>
 
-#ifdef Q_WS_X11
+#ifdef SC_USE_X11
 #include <QWidget>
 #include <QX11Info>
 

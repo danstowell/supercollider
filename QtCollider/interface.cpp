@@ -31,7 +31,7 @@
 #include <QDir>
 #include <QWebSettings>
 
-#ifdef Q_WS_X11
+#ifdef SC_USE_X11
 # include <X11/Xlib.h>
 #endif
 
@@ -58,7 +58,7 @@ void QtCollider::init() {
 
     QLocale::setDefault( QLocale::c() );
 
-#ifdef Q_WS_X11
+#ifdef SC_USE_X11
     XInitThreads();
 #endif
 

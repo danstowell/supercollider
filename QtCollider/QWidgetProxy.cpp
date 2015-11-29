@@ -34,7 +34,7 @@
 #include <QMimeData>
 #include <QDrag>
 
-#ifdef Q_WS_X11
+#ifdef SC_USE_X11
 # include "hacks/hacks_x11.hpp"
 # include <QX11Info>
 # include <X11/Xlib.h>
@@ -187,7 +187,7 @@ void QWidgetProxy::bringFrontEvent() {
   w->show();
   w->raise();
 
-#ifdef Q_WS_X11
+#ifdef SC_USE_X11
   raise_window(QX11Info::display(), w);
 #endif
 
@@ -423,7 +423,7 @@ bool QWidgetProxy::interpretKeyEvent( QObject *o, QEvent *e, QList<QVariant> &ar
 
   int unicode = character.unicode();
 
-#ifdef Q_WS_X11
+#ifdef SC_USE_X11
   KeySym sym = ke->nativeVirtualKey();
   int keycode = XKeysymToKeycode( QX11Info::display(), sym );
 #else

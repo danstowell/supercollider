@@ -43,7 +43,7 @@ extern const char * gIdeName;
 QcApplication * QcApplication::_instance = 0;
 QMutex QcApplication::_mutex;
 
-#ifdef Q_WS_X11
+#ifdef SC_USE_X11
 #include <X11/Xlib.h>
 #endif
 
