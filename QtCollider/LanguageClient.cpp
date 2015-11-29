@@ -67,9 +67,11 @@ void LangClient::onQuit( int exitCode )
 
 void LangClient::onLibraryShutdown()
 {
-  QWidgetList windows = QApplication::topLevelWidgets();
-  Q_FOREACH( QWidget *w, windows )
-    w->hide();
+  if(QtColliderUseGui()){
+    QWidgetList windows = QApplication::topLevelWidgets();
+    Q_FOREACH( QWidget *w, windows )
+      w->hide();
+  }
 }
 
 void LangClient::customEvent( QEvent *e )
