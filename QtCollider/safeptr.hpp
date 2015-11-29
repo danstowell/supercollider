@@ -24,7 +24,6 @@
 
 #include "Common.h"
 
-#include <QApplication>
 #include <QAtomicPointer>
 #include <QAtomicInt>
 #include <QMutex>

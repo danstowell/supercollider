@@ -134,7 +134,7 @@ bool QcApplication::event( QEvent *event )
         break;
     }
 
-    return QApplication::event( event );
+    return QCoreApplication::event( event );
 }
 
 bool QcApplication::notify( QObject * object, QEvent * event )
@@ -159,5 +159,5 @@ bool QcApplication::notify( QObject * object, QEvent * event )
         break;
     }
 
-    return QApplication::notify( object, event );
+    return QCoreApplication::notify( object, event );
 }

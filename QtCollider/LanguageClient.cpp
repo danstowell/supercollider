@@ -53,16 +53,16 @@ void LangClient::daemonLoop()
 void LangClient::sendSignal( Signal sig )
 {
   if (sig == sig_sched) {
-    QApplication::postEvent( this, new SCRequestEvent(Event_SCRequest_Tick) );
+    QCoreApplication::postEvent( this, new SCRequestEvent(Event_SCRequest_Tick) );
   } else {
     SC_TerminalClient::sendSignal( sig );
-    QApplication::postEvent( this, new SCRequestEvent(Event_SCRequest_Work) );
+    QCoreApplication::postEvent( this, new SCRequestEvent(Event_SCRequest_Work) );
   }
 }
 
 void LangClient::onQuit( int exitCode )
 {
-  QApplication::postEvent( this, new SCRequestEvent( Event_SCRequest_Quit, exitCode ) );
+  QCoreApplication::postEvent( this, new SCRequestEvent( Event_SCRequest_Quit, exitCode ) );
 }
 
 void LangClient::onLibraryShutdown()
@@ -80,7 +80,7 @@ void LangClient::customEvent( QEvent *e )
     tick();
 
   case Event_SCRequest_Work:
-    QApplication::removePostedEvents( this, Event_SCRequest_Work );
+    QCoreApplication::removePostedEvents( this, Event_SCRequest_Work );
     mIoService.poll();
     break;
   case Event_SCRequest_Quit:

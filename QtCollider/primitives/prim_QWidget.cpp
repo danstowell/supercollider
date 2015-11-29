@@ -29,7 +29,7 @@
 
 #include <QWidget>
 #include <QThread>
-#include <QApplication>
+#include <QCoreApplication>
 #include <QDrag>
 #include <QMimeData>
 
@@ -45,7 +45,7 @@ QC_LANG_PRIMITIVE( QWidget_SetFocus, 1, PyrSlot *r, PyrSlot *a, VMGlobals *g )
 {
   QWidgetProxy *proxy = QWIDGET_PROXY_RECEIVER(r);
 
-  QApplication::postEvent( proxy, new SetFocusEvent( IsTrue(a) ) );
+  QCoreApplication::postEvent( proxy, new SetFocusEvent( IsTrue(a) ) );
 
   return errNone;
 }
@@ -53,7 +53,7 @@ QC_LANG_PRIMITIVE( QWidget_SetFocus, 1, PyrSlot *r, PyrSlot *a, VMGlobals *g )
 QC_LANG_PRIMITIVE( QWidget_BringFront, 1, PyrSlot *r, PyrSlot *a, VMGlobals *g ) {
   QWidgetProxy *proxy = QWIDGET_PROXY_RECEIVER(r);
 
-  QApplication::postEvent( proxy,
+  QCoreApplication::postEvent( proxy,
                            new QEvent( (QEvent::Type) QtCollider::Event_Proxy_BringFront ) );
 
   return errNone;
@@ -109,7 +109,7 @@ QC_LANG_PRIMITIVE( QWidget_GetAlwaysOnTop, 0, PyrSlot *r, PyrSlot *a, VMGlobals 
 QC_LANG_PRIMITIVE( QWidget_SetAlwaysOnTop, 1, PyrSlot *r, PyrSlot *a, VMGlobals *g ) {
   QWidgetProxy *wProxy = QWIDGET_PROXY_RECEIVER(r);
 
-  QApplication::postEvent( wProxy, new SetAlwaysOnTopEvent( IsTrue(a) ) );
+  QCoreApplication::postEvent( wProxy, new SetAlwaysOnTopEvent( IsTrue(a) ) );
 
   return errNone;
 }

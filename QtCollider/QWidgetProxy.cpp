@@ -24,7 +24,7 @@
 #include "Common.h"
 #include "hacks/hacks_qt.hpp"
 
-#include <QApplication>
+#include <QCoreApplication>
 #include <QLayout>
 #include <QMouseEvent>
 #include <QKeyEvent>
@@ -532,7 +532,7 @@ void QWidgetProxy::customPaint( QPainter *painter )
 
 void QWidgetProxy::sendRefreshEventRecursive( QWidget *w ) {
   QEvent event( static_cast<QEvent::Type>( QtCollider::Event_Refresh ) );
-  QApplication::sendEvent( w, &event );
+  QCoreApplication::sendEvent( w, &event );
 
   const QObjectList &children = w->children();
   Q_FOREACH( QObject *child, children ) {

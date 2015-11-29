@@ -25,6 +25,7 @@
 #include "Common.h"
 
 #include <QApplication>
+#include <QCoreApplication>
 #include <QEventLoop>
 #include <QMutex>
 
@@ -33,7 +34,7 @@ namespace QtCollider {
 class EventProcessor : public QObject {
 public:
   void work() {
-    QApplication::postEvent( this, new QEvent(QEvent::User) );
+    QCoreApplication::postEvent( this, new QEvent(QEvent::User) );
     _loop.exec();
   }
   void customEvent( QEvent *e ) {

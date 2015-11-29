@@ -119,7 +119,7 @@ QC_LANG_PRIMITIVE( QObject_Destroy, 0, PyrSlot *r, PyrSlot *a, VMGlobals *g )
 
   // Post the destruction event asynchronously;
   DestroyEvent *e = new DestroyEvent( QObjectProxy::DestroyObject );
-  QApplication::postEvent( proxy, e );
+  QCoreApplication::postEvent( proxy, e );
 
   return errNone;
 }
@@ -136,7 +136,7 @@ int QObject_Finalize( struct VMGlobals *, struct PyrObject *obj )
 
   // Post the destruction event asynchronously;
   DestroyEvent *e = new DestroyEvent( QObjectProxy::DestroyProxyAndObject );
-  QApplication::postEvent( proxy, e );
+  QCoreApplication::postEvent( proxy, e );
 
   return errNone;
 }
@@ -308,7 +308,7 @@ QC_LANG_PRIMITIVE( QObject_SetProperty, 3, PyrSlot *r, PyrSlot *a, VMGlobals *g 
     SetPropertyEvent *e = new SetPropertyEvent();
     e->property = property;
     e->value = val;
-    QApplication::postEvent( proxy, e );
+    QCoreApplication::postEvent( proxy, e );
   }
 
   return errNone;

@@ -28,7 +28,7 @@
 #include "type_codec.hpp"
 #include "metatype.hpp"
 
-#include <QApplication>
+#include <QCoreApplication>
 #include <QWidget>
 #include <QVarLengthArray>
 #include <QThread>
@@ -72,7 +72,7 @@ bool QObjectProxy::compareThread() {
 void QObjectProxy::invalidate() {
   qcProxyDebugMsg( 1, QStringLiteral("Object has been deleted. Invalidating proxy.") );
   mutex.lock(); qObject = 0; mutex.unlock();
-  QApplication::postEvent( this, new QEvent((QEvent::Type) QtCollider::Event_Proxy_Release) );
+  QCoreApplication::postEvent( this, new QEvent((QEvent::Type) QtCollider::Event_Proxy_Release) );
 }
 
 static bool serializeSignature( QVarLengthArray<char, 512> & dst,
@@ -551,7 +551,7 @@ bool QObjectProxy::invokeEventHandler( QEvent *event, EventHandlerData &eh, QLis
   }
   else {
     ScMethodCallEvent *e = new ScMethodCallEvent( method, args );
-    QApplication::postEvent( this, e );
+    QCoreApplication::postEvent( this, e );
   }
 
   qcProxyDebugMsg(2,"Forwarding event to the system");

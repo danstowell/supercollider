@@ -47,7 +47,7 @@ static QPalette gSystemPalette;
 QPalette QtCollider::systemPalette() { return gSystemPalette; }
 
 void QtCollider::init() {
-  if( !QApplication::instance() ) {
+  if( !QCoreApplication::instance() ) {
     qcDebugMsg( 1, "Initializing QtCollider" );
 
     initResources();
