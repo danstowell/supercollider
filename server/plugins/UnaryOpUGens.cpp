@@ -23,7 +23,6 @@
 
 #include <boost/utility/enable_if.hpp>
 
-#ifdef NOVA_SIMD
 #include "simd_unary_arithmetic.hpp"
 #include "simd_binary_arithmetic.hpp"
 #include "simd_ternary_arithmetic.hpp"
@@ -122,7 +121,6 @@ namespace nova {
 NOVA_SIMD_DEFINE_UNARY_WRAPPER (distort, sc_distort_functor)
 NOVA_SIMD_DEFINE_UNARY_WRAPPER (scurve, sc_scurve_functor)
 }
-#endif
 
 using namespace std; // for math functions
 
@@ -254,7 +252,6 @@ inline F sc_invert(F x)
 
 DEFINE_UNARY_OP_FUNCS(invert, sc_invert)
 
-#ifdef NOVA_SIMD
 FLATTEN void invert_nova(UnaryOpUGen *unit, int inNumSamples)
 {
 	nova::minus_vec_simd(OUT(0), 0.f, IN(0), inNumSamples);
@@ -265,7 +262,6 @@ FLATTEN void invert_nova_64(UnaryOpUGen *unit, int inNumSamples)
 	nova::minus_vec_simd<64>(OUT(0), 0.f, IN(0));
 }
 
-#endif
 
 
 template <typename F>
@@ -293,7 +289,6 @@ void thru_a(UnaryOpUGen *unit, int inNumSamples)
 
 DEFINE_UNARY_OP_FUNCS(abs, std::abs)
 
-#ifdef NOVA_SIMD
 FLATTEN void zero_nova(UnaryOpUGen *unit, int inNumSamples)
 {
 	nova::zerovec_simd(OUT(0), inNumSamples);
@@ -323,11 +318,9 @@ FLATTEN void abs_nova_64(UnaryOpUGen *unit, int inNumSamples)
 {
 	nova::abs_vec_simd<64>(OUT(0), IN(0));
 }
-#endif
 
 DEFINE_UNARY_OP_FUNCS(recip, sc_reciprocal)
 
-#ifdef NOVA_SIMD
 FLATTEN void recip_nova(UnaryOpUGen *unit, int inNumSamples)
 {
 	nova::reciprocal_vec_simd(OUT(0), IN(0), inNumSamples);
@@ -337,16 +330,13 @@ FLATTEN void recip_nova_64(UnaryOpUGen *unit, int inNumSamples)
 {
 	nova::reciprocal_vec_simd<64>(OUT(0), IN(0));
 }
-#endif
 
 
 DEFINE_UNARY_OP_FUNCS(floor, floor)
 DEFINE_UNARY_OP_FUNCS(ceil, ceil)
 
-#ifdef NOVA_SIMD
 NOVA_WRAPPER_CT_UNROLL(floor, floor)
 NOVA_WRAPPER_CT_UNROLL(ceil, ceil)
-#endif
 
 DEFINE_UNARY_OP_FUNCS(sin, sin)
 DEFINE_UNARY_OP_FUNCS(cos, cos)
@@ -361,7 +351,6 @@ DEFINE_UNARY_OP_FUNCS(cosh, cosh)
 DEFINE_UNARY_OP_FUNCS(tanh, tanh)
 
 
-#ifdef NOVA_SIMD
 NOVA_WRAPPER(sin, sin)
 NOVA_WRAPPER(cos, cos)
 NOVA_WRAPPER(tan, tan)
@@ -369,7 +358,6 @@ NOVA_WRAPPER(asin, asin)
 NOVA_WRAPPER(acos, acos)
 NOVA_WRAPPER(atan, atan)
 NOVA_WRAPPER(tanh, tanh)
-#endif
 
 
 DEFINE_UNARY_OP_FUNCS(log, std::log)
@@ -377,18 +365,14 @@ DEFINE_UNARY_OP_FUNCS(log2, sc_log2)
 DEFINE_UNARY_OP_FUNCS(log10, sc_log10)
 DEFINE_UNARY_OP_FUNCS(exp, exp)
 
-#ifdef NOVA_SIMD
 NOVA_WRAPPER(log, log)
 NOVA_WRAPPER(log2, log2)
 NOVA_WRAPPER(log10, log10)
 NOVA_WRAPPER(exp, exp)
-#endif
 
 DEFINE_UNARY_OP_FUNCS(sqrt, sc_sqrt)
 
-#ifdef NOVA_SIMD
 NOVA_WRAPPER_CT_UNROLL(sqrt, signed_sqrt)
-#endif
 
 DEFINE_UNARY_OP_FUNCS(ampdb, sc_ampdb)
 DEFINE_UNARY_OP_FUNCS(dbamp, sc_dbamp)
@@ -399,7 +383,6 @@ DEFINE_UNARY_OP_FUNCS(ratiomidi, sc_ratiomidi)
 DEFINE_UNARY_OP_FUNCS(cpsoct, sc_cpsoct)
 DEFINE_UNARY_OP_FUNCS(octcps, sc_octcps)
 
-#ifdef NOVA_SIMD
 NOVA_WRAPPER(ampdb, amp2db)
 NOVA_WRAPPER(dbamp, db2amp)
 NOVA_WRAPPER(midicps, midi2freq)
@@ -408,44 +391,31 @@ NOVA_WRAPPER(midiratio, midi2ratio)
 NOVA_WRAPPER(ratiomidi, ratio2midi)
 NOVA_WRAPPER(cpsoct, freq2oct)
 NOVA_WRAPPER(octcps, oct2freq)
-#endif
 
 
 DEFINE_UNARY_OP_FUNCS(frac, sc_frac)
-#ifdef NOVA_SIMD
 NOVA_WRAPPER_CT_UNROLL(frac, frac)
-#endif
 
 
 DEFINE_UNARY_OP_FUNCS(squared, sc_squared)
-#ifdef NOVA_SIMD
 NOVA_WRAPPER_CT_UNROLL(squared, square)
-#endif
 
 
 DEFINE_UNARY_OP_FUNCS(cubed, sc_cubed)
-#ifdef NOVA_SIMD
 NOVA_WRAPPER_CT_UNROLL(cubed, cube)
-#endif
 
 DEFINE_UNARY_OP_FUNCS(sign, sc_sign)
 
-#ifdef NOVA_SIMD
 NOVA_WRAPPER_CT_UNROLL(sign, sgn)
-#endif
 
 DEFINE_UNARY_OP_FUNCS(distort, sc_distort)
 
-#ifdef NOVA_SIMD
 NOVA_WRAPPER_CT_UNROLL(distort, distort)
-#endif
 
 DEFINE_UNARY_OP_FUNCS(distortneg, sc_distortneg)
 DEFINE_UNARY_OP_FUNCS(softclip, sc_softclip)
 
-#ifdef NOVA_SIMD
 NOVA_WRAPPER_CT_UNROLL(softclip, softclip)
-#endif
 
 DEFINE_UNARY_OP_FUNCS(rectwindow, sc_rectwindow)
 DEFINE_UNARY_OP_FUNCS(hanwindow, sc_hanwindow)
@@ -453,14 +423,11 @@ DEFINE_UNARY_OP_FUNCS(welwindow, sc_welwindow)
 DEFINE_UNARY_OP_FUNCS(triwindow, sc_triwindow)
 
 DEFINE_UNARY_OP_FUNCS(scurve, sc_scurve)
-#ifdef NOVA_SIMD
 NOVA_WRAPPER_CT_UNROLL(scurve, scurve)
-#endif
 
 DEFINE_UNARY_OP_FUNCS(ramp, sc_ramp)
 
 
-#ifdef NOVA_SIMD
 FLATTEN void ramp_nova(UnaryOpUGen *unit, int inNumSamples)
 {
 	nova::clip_vec_simd(OUT(0), wrap_argument(IN(0)), wrap_argument(0.f), wrap_argument(1.f), inNumSamples);
@@ -470,7 +437,6 @@ FLATTEN void ramp_nova_64(UnaryOpUGen *unit, int inNumSamples)
 {
 	nova::clip_vec_simd<64>(OUT(0), wrap_argument(IN(0)), wrap_argument(0.f), wrap_argument(1.f));
 }
-#endif
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -759,8 +725,6 @@ static UnaryOpFunc ChooseDemandFunc(UnaryOpUGen *unit)
 	return func;
 }
 
-#ifdef NOVA_SIMD
-
 static UnaryOpFunc ChooseNovaSimdFunc(UnaryOpUGen *unit)
 {
 	void (*func)(UnaryOpUGen *unit, int inNumSamples);
@@ -882,7 +846,6 @@ static UnaryOpFunc ChooseNovaSimdFunc(UnaryOpUGen *unit)
 	}
 	return func;
 }
-#endif
 
 bool ChooseOperatorFunc(UnaryOpUGen *unit)
 {
@@ -893,7 +856,6 @@ bool ChooseOperatorFunc(UnaryOpUGen *unit)
 		func = ChooseDemandFunc(unit);
 	} else if (BUFLENGTH == 1) {
 		func = ChooseOneFunc(unit);
-#if defined(NOVA_SIMD)
 	} else if (!(BUFLENGTH & 15)) {
 		/* select normal function for initialization */
 		func = ChooseNormalFunc(unit);
@@ -902,7 +864,6 @@ bool ChooseOperatorFunc(UnaryOpUGen *unit)
 		/* select simd function */
 		func = ChooseNovaSimdFunc(unit);
 		ret = true;
-#endif
 	} else {
 		func = ChooseNormalFunc(unit);
 	}

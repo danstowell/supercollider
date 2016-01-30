@@ -22,14 +22,12 @@
 #include "SC_PlugIn.h"
 #include "function_attributes.h"
 
-#ifdef NOVA_SIMD
 #include "simd_memory.hpp"
 #include "simd_binary_arithmetic.hpp"
 #include "simd_pan.hpp"
 #include "simd_mix.hpp"
 using nova::slope_argument;
 
-#endif
 
 using namespace std; // for math functions
 
@@ -105,10 +103,8 @@ extern "C"
 	void LinPan2_Ctor(LinPan2* unit);
 
 	void Balance2_next_ak(Balance2 *unit, int inNumSamples);
-#ifdef NOVA_SIMD
 	FLATTEN void Balance2_next_ak_nova(Balance2 *unit, int inNumSamples);
 	FLATTEN void Balance2_next_ak_nova_64(Balance2 *unit, int inNumSamples);
-#endif
 	void Balance2_next_aa(Balance2 *unit, int inNumSamples);
 	void Balance2_Ctor(Balance2* unit);
 
@@ -152,23 +148,19 @@ extern "C"
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
-#ifdef NOVA_SIMD
 FLATTEN void LinPan2_next_ak_nova(LinPan2 *unit, int inNumSamples);
 FLATTEN void LinPan2_next_ak_nova_64(LinPan2 *unit, int inNumSamples);
-#endif
 
 void LinPan2_Ctor(LinPan2 *unit)
 {
 	if (INRATE(1) == calc_FullRate) {
 		SETCALC(LinPan2_next_aa);
 	} else {
-#ifdef NOVA_SIMD
 	if (BUFLENGTH == 64)
 		SETCALC(LinPan2_next_ak_nova_64);
 	if (!(BUFLENGTH & 15))
 		SETCALC(LinPan2_next_ak_nova);
 	else
-#endif
 		SETCALC(LinPan2_next_ak);
 	}
 	// Now we need to initialise some values, which on the first _next run will be "previous"
@@ -219,7 +211,6 @@ void LinPan2_next_ak(LinPan2 *unit, int inNumSamples)
 	}
 }
 
-#ifdef NOVA_SIMD
 void LinPan2_next_ak_nova(LinPan2 *unit, int inNumSamples)
 {
 	float pos = ZIN0(1);
@@ -271,7 +262,6 @@ void LinPan2_next_ak_nova_64(LinPan2 *unit, int inNumSamples)
 	} else
 		nova::pan2_vec_simd<64>(OUT(0), OUT(1), IN(0), leftamp, rightamp);
 }
-#endif
 
 void LinPan2_next_aa(LinPan2 *unit, int inNumSamples)
 {
@@ -303,16 +293,12 @@ void Balance2_Ctor(Balance2 *unit)
 	if (INRATE(2) == calc_FullRate) {
 		SETCALC(Balance2_next_aa);
 	} else {
-#ifdef NOVA_SIMD
 		if (BUFLENGTH == 64)
 			SETCALC(Balance2_next_ak_nova_64);
 		else if (!(BUFLENGTH & 15))
 			SETCALC(Balance2_next_ak_nova);
 		else
 			SETCALC(Balance2_next_ak);
-#else
-		SETCALC(Balance2_next_ak);
-#endif
 	}
 	unit->m_pos = ZIN0(2);
 	unit->m_level = ZIN0(3);
@@ -364,7 +350,6 @@ void Balance2_next_ak(Balance2 *unit, int inNumSamples)
 	}
 }
 
-#ifdef NOVA_SIMD
 void Balance2_next_ak_nova(Balance2 *unit, int inNumSamples)
 {
 	float pos = ZIN0(2);
@@ -430,7 +415,6 @@ void Balance2_next_ak_nova_64(Balance2 *unit, int inNumSamples)
 		nova::times_vec_simd<64>(OUT(1), IN(1), rightamp);
 	}
 }
-#endif
 
 void Balance2_next_aa(Balance2 *unit, int inNumSamples)
 {
@@ -471,23 +455,19 @@ void Balance2_next_aa(Balance2 *unit, int inNumSamples)
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#ifdef NOVA_SIMD
 FLATTEN void XFade2_next_ak_nova(XFade2 *unit, int inNumSamples);
 FLATTEN void XFade2_next_ak_nova_64(XFade2 *unit, int inNumSamples);
-#endif
 
 void XFade2_Ctor(XFade2 *unit)
 {
 	if (INRATE(2) == calc_FullRate) {
 		SETCALC(XFade2_next_aa);
 	} else {
-#ifdef NOVA_SIMD
 		if (BUFLENGTH == 64)
 			SETCALC(XFade2_next_ak_nova_64);
 		if (!(BUFLENGTH & 15))
 			SETCALC(XFade2_next_ak_nova);
 		else
-#endif
 		SETCALC(XFade2_next_ak);
 	}
 	unit->m_pos = ZIN0(2);
@@ -537,7 +517,6 @@ void XFade2_next_ak(XFade2 *unit, int inNumSamples)
 	}
 }
 
-#ifdef NOVA_SIMD
 void XFade2_next_ak_nova(XFade2 *unit, int inNumSamples)
 {
 	float pos = ZIN0(2);
@@ -595,8 +574,6 @@ void XFade2_next_ak_nova_64(XFade2 *unit, int inNumSamples)
 	} else
 		nova::mix_vec_simd<64>(OUT(0), IN(0), leftamp, IN(1), rightamp);
 }
-
-#endif
 
 void XFade2_next_aa(XFade2 *unit, int inNumSamples)
 {
@@ -698,8 +675,6 @@ void LinXFade2_next_a(LinXFade2 *unit, int inNumSamples)
 	);
 }
 
-#ifdef NOVA_SIMD
-
 FLATTEN void LinXFade2_next_i_nova(LinXFade2 *unit, int inNumSamples)
 {
 	float amp = unit->m_amp;
@@ -733,8 +708,6 @@ FLATTEN void LinXFade2_next_k_nova(LinXFade2 *unit, int inNumSamples)
 		nova::mix_vec_simd(OUT(0), IN(0), 1.f - amp, IN(1), amp, inNumSamples);
 }
 
-#endif
-
 void LinXFade2_Ctor(LinXFade2 *unit)
 {
 	switch (INRATE(2)) {
@@ -743,24 +716,16 @@ void LinXFade2_Ctor(LinXFade2 *unit)
 		break;
 
 	case calc_BufRate:
-#ifdef NOVA_SIMD
 		if (!(BUFLENGTH & 15))
 			SETCALC(LinXFade2_next_k_nova);
 		else
 			SETCALC(LinXFade2_next_k);
-#else
-		SETCALC(LinXFade2_next_k);
-#endif
 		break;
 	case calc_ScalarRate:
-#ifdef NOVA_SIMD
 		if (!(BUFLENGTH & 15))
 			SETCALC(LinXFade2_next_i_nova);
 		else
 			SETCALC(LinXFade2_next_i);
-#else
-		SETCALC(LinXFade2_next_i);
-#endif
 		break;
 	}
 
@@ -815,7 +780,6 @@ void Pan2_next_ak(Pan2 *unit, int inNumSamples)
 	}
 }
 
-#ifdef NOVA_SIMD
 void Pan2_next_ak_nova(Pan2 *unit, int inNumSamples)
 {
 	float pos = ZIN0(1);
@@ -874,9 +838,6 @@ void Pan2_next_ak_nova_64(Pan2 *unit, int inNumSamples)
 		nova::pan2_vec_simd<64>(OUT(0), OUT(1), IN(0), leftamp, rightamp);
 }
 
-#endif
-
-
 void Pan2_next_aa(Pan2 *unit, int inNumSamples)
 {
 	float *leftout = ZOUT(0);
@@ -920,16 +881,12 @@ void Pan2_Ctor(Pan2 *unit)
 	if (INRATE(1) == calc_FullRate) {
 		SETCALC(Pan2_next_aa);
 	} else {
-#if defined(NOVA_SIMD)
 		if (BUFLENGTH == 64)
 			SETCALC(Pan2_next_ak_nova_64);
 		if (!(BUFLENGTH & 15))
 			SETCALC(Pan2_next_ak_nova);
 		else
 			SETCALC(Pan2_next_ak);
-#else
-		SETCALC(Pan2_next_ak);
-#endif
 	}
 
 	unit->m_pos = ZIN0(1);
@@ -1250,8 +1207,6 @@ void PanB2_next(PanB2 *unit, int inNumSamples)
 	}
 }
 
-#ifdef NOVA_SIMD
-
 FLATTEN void PanB2_next_nova(PanB2 *unit, int inNumSamples)
 {
 	float *Wout = OUT(0);
@@ -1300,15 +1255,12 @@ FLATTEN void PanB2_next_nova(PanB2 *unit, int inNumSamples)
 		nova::times_vec_simd(Yout, in, Y_amp, inNumSamples);
 	}
 }
-#endif
 
 void PanB2_Ctor(PanB2 *unit)
 {
-#if defined(NOVA_SIMD)
 	if (!(BUFLENGTH & 15))
 		SETCALC(PanB2_next_nova);
 	else
-#endif
 		SETCALC(PanB2_next);
 
 	float azimuth = unit->m_azimuth = ZIN0(1);
@@ -1459,9 +1411,7 @@ void calcPos(float pos, int numOutputs, float width, float orientation)
 }
 */
 
-#ifdef NOVA_SIMD
 void PanAz_next_ak_nova(PanAz *unit, int inNumSamples);
-#endif
 
 void PanAz_Ctor(PanAz *unit)
 {
@@ -1482,14 +1432,10 @@ void PanAz_Ctor(PanAz *unit)
 
 		std::fill_n(unit->m_chanamp, numOutputs, 0);
 
-#ifdef NOVA_SIMD
 		if (!(BUFLENGTH & 15))
 			SETCALC(PanAz_next_ak_nova);
 		else
 			SETCALC(PanAz_next_ak);
-#else
-		SETCALC(PanAz_next_ak);
-#endif
 	}
 }
 
@@ -1549,7 +1495,6 @@ void PanAz_next_ak(PanAz *unit, int inNumSamples)
 	}
 }
 
-#ifdef NOVA_SIMD
 FLATTEN void PanAz_next_ak_nova(PanAz *unit, int inNumSamples)
 {
 	float pos = ZIN0(1);
@@ -1592,7 +1537,6 @@ FLATTEN void PanAz_next_ak_nova(PanAz *unit, int inNumSamples)
 		}
 	}
 }
-#endif
 
 void PanAz_next_aa(PanAz *unit, int inNumSamples)
 {
@@ -1702,11 +1646,9 @@ void Rotate2_Ctor(Rotate2 *unit)
 
 void DecodeB2_Ctor(DecodeB2 *unit)
 {
-#if defined(NOVA_SIMD)
 	if (!(BUFLENGTH & 15))
 		SETCALC(DecodeB2_next_nova);
 	else
-#endif
 		SETCALC(DecodeB2_next);
 
 	DecodeB2_next(unit, 1);
@@ -1750,7 +1692,6 @@ void DecodeB2_next(DecodeB2 *unit, int inNumSamples)
 	}
 }
 
-#ifdef NOVA_SIMD
 void DecodeB2_next_nova(DecodeB2 *unit, int inNumSamples)
 {
 	float *Win0 = IN(0);
@@ -1787,8 +1728,6 @@ void DecodeB2_next_nova(DecodeB2 *unit, int inNumSamples)
 		X_amp = X_tmp;
 	}
 }
-#endif
-
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -18,9 +18,7 @@
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
 */
 
-#ifdef NOVA_SIMD
 #include "simd_memory.hpp"
-#endif
 
 #include "SC_PlugIn.h"
 #include <cstdio>
@@ -2358,12 +2356,10 @@ static inline void DelayN_delay_loop(float * out, const float * in, long & iwrph
 			remain -= nsmps;
 			if (irdphase < 0) {
 				if ((dlywr - dlyrd) > nsmps) {
-#ifdef NOVA_SIMD
 					if ((nsmps & (nova::vec<float>::size - 1)) == 0) {
 						nova::copyvec_nn_simd(dlywr + ZOFF, in + ZOFF, nsmps);
 						nova::zerovec_na_simd(out + ZOFF, nsmps);
 					} else
-#endif
 					{
 						ZCopy(nsmps, dlywr, in);
 						ZClear(nsmps, out);
@@ -2395,12 +2391,10 @@ static inline void DelayN_delay_loop(float * out, const float * in, long & iwrph
 			remain -= nsmps;
 
 			if (std::abs((float)(dlyrd - dlywr)) > nsmps) {
-#ifdef NOVA_SIMD
 				if ((nsmps & 15) == 0) {
 					nova::copyvec_nn_simd(dlywr + ZOFF, in + ZOFF, nsmps);
 					nova::copyvec_nn_simd(out + ZOFF, dlyrd + ZOFF, nsmps);
 				} else
-#endif
 				{
 					ZCopy(nsmps, dlywr, in);
 					ZCopy(nsmps, out, dlyrd);
@@ -4010,22 +4004,18 @@ void Delay_next_0(DelayUnit *unit, int inNumSamples)
 void Delay_next_0_nop(DelayUnit *unit, int inNumSamples)
 {}
 
-#ifdef NOVA_SIMD
 void Delay_next_0_nova(DelayUnit *unit, int inNumSamples)
 {
 	nova::copyvec_simd(OUT(0), IN(0), inNumSamples);
 }
-#endif
 
 static bool DelayUnit_init_0(DelayUnit *unit)
 {
 	if (INRATE(2) == calc_ScalarRate && ZIN0(2) == 0) {
 		if (ZIN(0) == ZOUT(0))
 			SETCALC(Delay_next_0_nop);
-#ifdef NOVA_SIMD
 		else if (!(BUFLENGTH & 15))
 			SETCALC(Delay_next_0_nova);
-#endif
 		else
 			SETCALC(Delay_next_0);
 
@@ -7328,7 +7318,6 @@ static void DelTapWr_first(DelTapWr *unit, int inNumSamples)
 	CHECK_DELTAP_BUF
 
 	// zero out the buffer!
-#ifdef NOVA_SIMD
 	if (nova::vec<float>::is_aligned(bufData)) {
 		uint32 unroll = bufSamples & (~(nova::vec<float>::size - 1));
 		nova::zerovec_simd(bufData, unroll);
@@ -7337,9 +7326,6 @@ static void DelTapWr_first(DelTapWr *unit, int inNumSamples)
 		Clear(remain, bufData + unroll);
 	} else
 		Clear(bufSamples, bufData);
-#else
-	Clear(bufSamples, bufData);
-#endif
 
 	out[0] = (float)phase;
 	bufData[phase] = in[0];
@@ -7380,11 +7366,9 @@ static inline void DelTapWr_perform(DelTapWr *unit, int inNumSamples)
 	if (inNumSamples < buf_remain)
 	{
 		/* fast-path */
-#ifdef NOVA_SIMD
 		if (simd)
 			nova::copyvec_an_simd(bufData+phase, IN(1), inNumSamples);
 		else
-#endif
 			Copy(inNumSamples, bufData + phase, IN(1));
 		LOOP1 (inNumSamples,
 			ZXP(phase_out) = phase++;
@@ -7496,11 +7480,9 @@ inline void DelTapRd_perform1_k(DelTapRd *unit, int inNumSamples)
 		if ( (iphase >= 0) // lower bound
 			&& iphase + inNumSamples < (bufSamples - 1)) //upper bound
 			{
-#ifdef NOVA_SIMD
 				if (simd)
 					nova::copyvec_na_simd(OUT(0), bufData + iphase, inNumSamples);
 				else
-#endif
 					Copy(inNumSamples, OUT(0), bufData + iphase);
 			}
 		else

@@ -1298,7 +1298,6 @@ void T2A_next(T2A *unit, int inNumSamples)
 	unit->mLevel = level;
 }
 
-#ifdef NOVA_SIMD
 FLATTEN void T2A_next_nova(T2A *unit, int inNumSamples)
 {
 	float level = IN0(0);
@@ -1321,18 +1320,14 @@ FLATTEN void T2A_next_nova_64(T2A *unit, int inNumSamples)
 	unit->mLevel = level;
 }
 
-#endif
-
 void T2A_Ctor(T2A* unit)
 {
-#ifdef NOVA_SIMD
 	if (BUFLENGTH == 64)
 		SETCALC(T2A_next_nova_64);
 	else if (!(BUFLENGTH & 15))
 		SETCALC(T2A_next_nova);
 	else
-#endif
-	SETCALC(T2A_next);
+		SETCALC(T2A_next);
 	T2A_next(unit, 1);
 }
 
@@ -1407,7 +1402,6 @@ void Line_next(Line *unit, int inNumSamples)
 	unit->mLevel = level;
 }
 
-#ifdef NOVA_SIMD
 FLATTEN void Line_next_nova(Line *unit, int inNumSamples)
 {
 	double level = unit->mLevel;
@@ -1457,18 +1451,14 @@ FLATTEN void Line_next_nova_64(Line *unit, int inNumSamples)
 	unit->mLevel = level;
 }
 
-#endif
-
 void Line_Ctor(Line* unit)
 {
-#ifdef NOVA_SIMD
 	if (BUFLENGTH == 64)
 		SETCALC(Line_next_nova);
 	else if (!(BUFLENGTH & 15))
 		SETCALC(Line_next_nova);
 	else
-#endif
-	SETCALC(Line_next);
+		SETCALC(Line_next);
 	double start = ZIN0(0);
 	double end = ZIN0(1);
 	double dur = ZIN0(2);
@@ -1529,7 +1519,6 @@ void XLine_next(XLine *unit, int inNumSamples)
 	unit->mLevel = level;
 }
 
-#ifdef NOVA_SIMD
 FLATTEN void XLine_next_nova(XLine *unit, int inNumSamples)
 {
 	double level = unit->mLevel;
@@ -1574,19 +1563,14 @@ FLATTEN void XLine_next_nova_64(XLine *unit, int inNumSamples)
 	unit->mLevel = level;
 }
 
-#endif
-
 void XLine_Ctor(XLine* unit)
 {
-#ifdef NOVA_SIMD
 	if (BUFLENGTH == 64)
 		SETCALC(XLine_next_nova_64);
 	else if (!(BUFLENGTH & 15))
 		SETCALC(XLine_next_nova);
 	else
-#endif
-
-	SETCALC(XLine_next);
+		SETCALC(XLine_next);
 	double start = ZIN0(0);
 	double end = ZIN0(1);
 	double dur = ZIN0(2);
@@ -1967,7 +1951,6 @@ void Clip_next_k(Clip* unit, int inNumSamples)
 	ZXP(out) = sc_clip(ZXP(in), lo, hi);
 }
 
-#ifdef NOVA_SIMD
 void Clip_next_nova_ii(Clip* unit, int inNumSamples)
 {
 	float lo = unit->m_lo;
@@ -2087,8 +2070,6 @@ void Clip_next_nova_aa(Clip* unit, int inNumSamples)
 	nova::clip_vec_simd(OUT(0), IN(0), IN(1), IN(2), inNumSamples);
 }
 
-#endif
-
 typedef void (*ClipCalcFunc)(Clip*, int);
 
 static ClipCalcFunc Clip_SelectCalc(Clip * unit)
@@ -2099,7 +2080,6 @@ static ClipCalcFunc Clip_SelectCalc(Clip * unit)
 	int loRate = INRATE(1);
 	int hiRate = INRATE(2);
 
-#ifdef NOVA_SIMD
 	if (!(BUFLENGTH & 15)) {
 		switch (loRate)
 		{
@@ -2137,7 +2117,6 @@ static ClipCalcFunc Clip_SelectCalc(Clip * unit)
 			break;
 		}
 	}
-#endif
 
 	if (loRate == calc_FullRate && hiRate == calc_FullRate)
 		return Clip_next_aa;
@@ -2475,7 +2454,6 @@ void LinExp_next(LinExp *unit, int inNumSamples)
 	);
 }
 
-#ifdef NOVA_SIMD
 static inline void LinExp_next_nova_loop(float * out, const float * in, int inNumSamples,
 										 nova::vec<float> dstlo, nova::vec<float> dstratio,
 										 nova::vec<float> rsrcrange, nova::vec<float> rrminuslo)
@@ -2523,8 +2501,6 @@ FLATTEN static void LinExp_next_nova_kk(LinExp *unit, int inNumSamples)
 
 	LinExp_next_nova_loop(out, in, inNumSamples, dstlo, dstratio, rsrcrange, rrminuslo);
 }
-
-#endif
 
 void LinExp_next_kk(LinExp *unit, int inNumSamples)
 {
@@ -2627,18 +2603,16 @@ static void LinExp_SetCalc(LinExp* unit)
 		}
 	};
 
-#ifdef NOVA_SIMD
 	if ((BUFLENGTH % (2*nova::vec<float>::size)) == 0)
 		if (allScalar)
 			SETCALC(LinExp_next_nova);
 		else
 			SETCALC(LinExp_next_nova_kk);
 	else
-#endif
-	if (allScalar)
-		SETCALC(LinExp_next);
-	else
-		SETCALC(LinExp_next_kk);
+		if (allScalar)
+			SETCALC(LinExp_next);
+		else
+			SETCALC(LinExp_next_kk);
 
 	if (!allScalar)
 		return;
@@ -2700,9 +2674,7 @@ enum {
 };
 
 
-#ifdef NOVA_SIMD
 void EnvGen_next_ak_nova(EnvGen *unit, int inNumSamples);
-#endif
 
 #define ENVGEN_NOT_STARTED 1000000000
 
@@ -2713,12 +2685,10 @@ void EnvGen_Ctor(EnvGen *unit)
 		if (INRATE(0) == calc_FullRate) {
 			SETCALC(EnvGen_next_aa);
 		} else {
-#ifdef NOVA_SIMD
 			if (!(BUFLENGTH & 15))
 				SETCALC(EnvGen_next_ak_nova);
 			else
-#endif
-			SETCALC(EnvGen_next_ak);
+				SETCALC(EnvGen_next_ak);
 		}
 	} else {
 		SETCALC(EnvGen_next_k);
@@ -3093,7 +3063,6 @@ void EnvGen_next_ak(EnvGen *unit, int inNumSamples)
 
 }
 
-#ifdef NOVA_SIMD
 FLATTEN void EnvGen_next_ak_nova(EnvGen *unit, int inNumSamples)
 {
 	float *out = ZOUT(0);
@@ -3151,8 +3120,6 @@ FLATTEN void EnvGen_next_ak_nova(EnvGen *unit, int inNumSamples)
 	unit->m_counter = counter;
 
 }
-#endif
-
 
 void EnvGen_next_aa(EnvGen *unit, int inNumSamples)
 {

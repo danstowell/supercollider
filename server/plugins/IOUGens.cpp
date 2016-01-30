@@ -30,15 +30,12 @@
 #include "nova-tt/rw_spinlock.hpp"
 #endif
 
-#ifdef NOVA_SIMD
 #include "simd_memory.hpp"
 #include "simd_mix.hpp"
 #include "simd_binary_arithmetic.hpp"
 
 #include "function_attributes.h"
 using nova::slope_argument;
-
-#endif
 
 static InterfaceTable *ft;
 
@@ -451,7 +448,6 @@ struct AudioBusGuard
 	const bool isValid;
 };
 
-#ifdef NOVA_SIMD
 FLATTEN void In_next_a_nova(IOUnit *unit, int inNumSamples)
 {
 	World *world = unit->mWorld;
@@ -502,8 +498,6 @@ FLATTEN void In_next_a_nova_64(IOUnit *unit, int inNumSamples)
 			nova::zerovec_simd<64>(out);
 	}
 }
-
-#endif
 
 void In_next_a(IOUnit *unit, int inNumSamples)
 {
@@ -585,13 +579,11 @@ void In_Ctor(IOUnit* unit)
 	unit->m_fbusChannel = std::numeric_limits<float>::quiet_NaN();
 
 	if (unit->mCalcRate == calc_FullRate) {
-#ifdef NOVA_SIMD
 		if (BUFLENGTH == 64)
 			SETCALC(In_next_a_nova_64);
 		else if (!(BUFLENGTH & 15))
 			SETCALC(In_next_a_nova);
 		else
-#endif
 		SETCALC(In_next_a);
 		unit->m_bus = world->mAudioBus;
 		unit->m_busTouched = world->mAudioBusTouched;
@@ -790,7 +782,6 @@ void ReplaceOut_next_k(IOUnit *unit, int inNumSamples)
 	}
 }
 
-#ifdef NOVA_SIMD
 FLATTEN void ReplaceOut_next_a_nova(IOUnit *unit, int inNumSamples)
 {
 	World *world = unit->mWorld;
@@ -841,21 +832,17 @@ FLATTEN void ReplaceOut_next_a_nova_64(IOUnit *unit, int inNumSamples)
 	}
 }
 
-#endif /* NOVA_SIMD */
-
 void ReplaceOut_Ctor(IOUnit* unit)
 {
 	World *world = unit->mWorld;
 	unit->m_fbusChannel = -1.;
 
 	if (unit->mCalcRate == calc_FullRate) {
-#ifdef NOVA_SIMD
 		if (BUFLENGTH == 64)
 			SETCALC(ReplaceOut_next_a_nova_64);
 		else if (!(BUFLENGTH & 15))
 			SETCALC(ReplaceOut_next_a_nova);
 		else
-#endif
 		SETCALC(ReplaceOut_next_a);
 		unit->m_bus = world->mAudioBus;
 		unit->m_busTouched = world->mAudioBusTouched;
@@ -929,8 +916,6 @@ void vOut_next_a(IOUnit *unit, int inNumSamples)
 }
 #endif
 
-
-#ifdef NOVA_SIMD
 FLATTEN void Out_next_a_nova(IOUnit *unit, int inNumSamples)
 {
 	World *world = unit->mWorld;
@@ -989,8 +974,6 @@ FLATTEN void Out_next_a_nova_64(IOUnit *unit, int inNumSamples)
 		}
 	}
 }
-#endif
-
 
 void Out_next_k(IOUnit *unit, int inNumSamples)
 {
@@ -1028,21 +1011,12 @@ void Out_Ctor(IOUnit* unit)
 
 	if (unit->mCalcRate == calc_FullRate) {
 
-#if defined(NOVA_SIMD)
 		if (BUFLENGTH == 64)
 			SETCALC(Out_next_a_nova_64);
 		else if (!(BUFLENGTH & 15))
 			SETCALC(Out_next_a_nova);
 		else
 			SETCALC(Out_next_a);
-#else
-
-#ifdef IPHONE_VEC
-		SETCALC(vOut_next_a);
-#else
-		SETCALC(Out_next_a);
-#endif
-#endif
 		unit->m_bus = world->mAudioBus;
 		unit->m_busTouched = world->mAudioBusTouched;
 	} else {
@@ -1138,7 +1112,6 @@ void XOut_next_a(XOut *unit, int inNumSamples)
 	unit->m_xfade = next_xfade;
 }
 
-#ifdef NOVA_SIMD
 FLATTEN void XOut_next_a_nova(XOut *unit, int inNumSamples)
 {
 	World *world = unit->mWorld;
@@ -1200,8 +1173,6 @@ FLATTEN void XOut_next_a_nova(XOut *unit, int inNumSamples)
 	}
 }
 
-#endif
-
 
 
 void XOut_next_k(XOut *unit, int inNumSamples)
@@ -1242,11 +1213,10 @@ void XOut_Ctor(XOut* unit)
 	unit->m_fbusChannel = -1.;
 	unit->m_xfade = ZIN0(1);
 	if (unit->mCalcRate == calc_FullRate) {
-#ifdef NOVA_SIMD
 		if (!(BUFLENGTH & 15))
 			SETCALC(XOut_next_a_nova);
-#endif
-		SETCALC(XOut_next_a);
+		else
+			SETCALC(XOut_next_a);
 		unit->m_bus = world->mAudioBus;
 		unit->m_busTouched = world->mAudioBusTouched;
 	} else {
@@ -1473,7 +1443,6 @@ void LocalIn_next_a(LocalIn *unit, int inNumSamples)
 	}
 }
 
-#ifdef NOVA_SIMD
 FLATTEN void LocalIn_next_a_nova(LocalIn *unit, int inNumSamples)
 {
 	World *world = unit->mWorld;
@@ -1516,8 +1485,6 @@ FLATTEN void LocalIn_next_a_nova_64(LocalIn *unit, int inNumSamples)
 			Fill(inNumSamples, out, IN0(i));
 	}
 }
-#endif
-
 
 void LocalIn_next_k(LocalIn *unit, int inNumSamples)
 {
@@ -1564,13 +1531,11 @@ void LocalIn_Ctor(LocalIn* unit)
 			return;
 		}
 		unit->mParent->mLocalAudioBusUnit = unit;
-#ifdef NOVA_SIMD
 		if (BUFLENGTH == 64)
 			SETCALC(LocalIn_next_a_nova_64);
 		else if (!(BUFLENGTH & 15))
 			SETCALC(LocalIn_next_a_nova);
 		else
-#endif
 		SETCALC(LocalIn_next_a);
 		LocalIn_next_a(unit, 1);
 	} else {
@@ -1625,7 +1590,6 @@ void LocalOut_next_a(IOUnit *unit, int inNumSamples)
 	}
 }
 
-#ifdef NOVA_SIMD
 FLATTEN void LocalOut_next_a_nova(IOUnit *unit, int inNumSamples)
 {
 	//Print("LocalOut_next_a %d\n", unit->mNumInputs);
@@ -1685,7 +1649,6 @@ FLATTEN void LocalOut_next_a_nova_64(IOUnit *unit, int inNumSamples)
 		//Print("LocalOut %d %g %g\n", i, in[0], out[0]);
 	}
 }
-#endif
 
 
 void LocalOut_next_k(IOUnit *unit, int inNumSamples)
@@ -1720,13 +1683,11 @@ void LocalOut_Ctor(IOUnit* unit)
 
 	if (unit->mCalcRate == calc_FullRate) {
 
-#ifdef NOVA_SIMD
 		if (BUFLENGTH == 64)
 			SETCALC(LocalOut_next_a_nova_64);
 		else if (!(BUFLENGTH & 15))
 			SETCALC(LocalOut_next_a_nova);
 		else
-#endif
 		SETCALC(LocalOut_next_a);
 	} else {
 		SETCALC(LocalOut_next_k);

@@ -80,10 +80,8 @@ if(SN_MEMORY_DEBUGGING)
     target_compile_definitions(libsupernova PUBLIC NOVA_MEMORY_DEBUGGING)
 endif()
 
-if(NOVA_SIMD)
-    target_compile_definitions(libsupernova PUBLIC NOVA_SIMD)
-    target_include_directories(libsupernova PUBLIC ${CMAKE_SOURCE_DIR}/external_libraries)
-endif()
+target_compile_definitions(libsupernova PUBLIC NOVA_SIMD)
+target_include_directories(libsupernova PUBLIC ${CMAKE_SOURCE_DIR}/external_libraries)
 
 find_library(DL NAMES dl)
 if(DL)

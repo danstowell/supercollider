@@ -142,9 +142,7 @@ if(DL)
     target_link_libraries(libscsynth ${DL})
 endif()
 
-if(NOVA_SIMD)
-	target_compile_definitions(libscsynth PUBLIC NOVA_SIMD)
-endif()
+target_compile_definitions(libscsynth PUBLIC NOVA_SIMD)
 
 if(SNDFILE_FOUND)
 	target_link_libraries(libscsynth ${SNDFILE_LIBRARIES})

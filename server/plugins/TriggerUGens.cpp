@@ -25,12 +25,9 @@
 
 #include "simd_peakmeter.hpp"
 
-#ifdef NOVA_SIMD
 #include "simd_memory.hpp"
 
 #include "function_attributes.h"
-
-#endif
 
 static InterfaceTable *ft;
 
@@ -369,27 +366,21 @@ extern "C"
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#ifdef NOVA_SIMD
 FLATTEN void Trig1_next_nova(Trig1 *unit, int inNumSamples);
 FLATTEN void Trig1_next_k_nova(Trig1 *unit, int inNumSamples);
-#endif
 
 void Trig1_Ctor(Trig1 *unit)
 {
 	if (unit->mCalcRate == calc_FullRate && INRATE(0) != calc_FullRate) {
-#ifdef NOVA_SIMD
 		if (!(BUFLENGTH & 15))
 			SETCALC(Trig1_next_k_nova);
 		else
-#endif
-		SETCALC(Trig1_next_k);
+			SETCALC(Trig1_next_k);
 	} else {
-#ifdef NOVA_SIMD
 		if (!(BUFLENGTH & 15))
 			SETCALC(Trig1_next_nova);
 		else
-#endif
-		SETCALC(Trig1_next);
+			SETCALC(Trig1_next);
 	}
 	unit->mCounter = 0;
 	unit->m_prevtrig = 0.f;
@@ -456,7 +447,6 @@ void Trig1_next_k(Trig1 *unit, int inNumSamples)
 	unit->mCounter = counter;
 }
 
-#ifdef NOVA_SIMD
 void Trig1_next_nova(Trig1 *unit, int inNumSamples)
 {
 	float *out = ZOUT(0);
@@ -542,32 +532,25 @@ void Trig1_next_k_nova(Trig1 *unit, int inNumSamples)
 	unit->m_prevtrig = prevtrig;
 	unit->mCounter = counter;
 }
-#endif
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#ifdef NOVA_SIMD
 void Trig_next_nova(Trig *unit, int inNumSamples);
 void Trig_next_k_nova(Trig *unit, int inNumSamples);
-#endif
 
 void Trig_Ctor(Trig *unit)
 {
 	if (unit->mCalcRate == calc_FullRate && INRATE(0) != calc_FullRate) {
-#ifdef NOVA_SIMD
 		if (!(BUFLENGTH & 15))
 			SETCALC(Trig_next_k_nova);
 		else
-#endif
-		SETCALC(Trig_next_k);
+			SETCALC(Trig_next_k);
 	} else {
-#ifdef NOVA_SIMD
 		if (!(BUFLENGTH & 15))
 			SETCALC(Trig_next_nova);
 		else
-#endif
-		SETCALC(Trig_next);
+			SETCALC(Trig_next);
 	}
 
 	unit->mCounter = 0;
@@ -642,7 +625,6 @@ void Trig_next_k(Trig *unit, int inNumSamples)
 	unit->mLevel = level;
 }
 
-#ifdef NOVA_SIMD
 void Trig_next_nova(Trig *unit, int inNumSamples)
 {
 	float *out = ZOUT(0);
@@ -732,7 +714,6 @@ void Trig_next_k_nova(Trig *unit, int inNumSamples)
 	unit->mCounter = counter;
 	unit->mLevel = level;
 }
-#endif
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -1057,7 +1038,6 @@ void ToggleFF_next(ToggleFF *unit, int inNumSamples)
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-#ifdef NOVA_SIMD
 void Latch_next_ak_nova(Latch *unit, int inNumSamples)
 {
 	float level = unit->mLevel;
@@ -1083,21 +1063,18 @@ void Latch_next_ak_nova_64(Latch *unit, int inNumSamples)
 	unit->m_prevtrig = curtrig;
 	unit->mLevel = level;
 }
-#endif
 
 void Latch_Ctor(Latch *unit)
 {
 	if (INRATE(1) == calc_FullRate) {
 		SETCALC(Latch_next_aa);
 	} else {
-#ifdef NOVA_SIMD
 		if (BUFLENGTH == 64)
 			SETCALC(Latch_next_ak_nova_64);
 		if (!(BUFLENGTH & 15))
 			SETCALC(Latch_next_ak_nova);
 		else
-#endif
-		SETCALC(Latch_next_ak);
+			SETCALC(Latch_next_ak);
 	}
 
 	unit->m_prevtrig = 0.f;
@@ -1145,7 +1122,6 @@ void Latch_next_aa(Latch *unit, int inNumSamples)
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#ifdef NOVA_SIMD
 FLATTEN void Gate_next_ak_nova(Gate *unit, int inNumSamples)
 {
 	float *trig = ZIN(1);
@@ -1171,21 +1147,18 @@ FLATTEN void Gate_next_ak_nova_64(Gate *unit, int inNumSamples)
 	} else
 		nova::setvec_simd<64>(OUT(0), level);
 }
-#endif
 
 void Gate_Ctor(Gate *unit)
 {
 	if (INRATE(1) == calc_FullRate) {
 		SETCALC(Gate_next_aa);
 	} else {
-#ifdef NOVA_SIMD
 		if (BUFLENGTH == 64)
 			SETCALC(Gate_next_ak_nova_64);
 		if (!(BUFLENGTH & 15))
 			SETCALC(Gate_next_ak_nova);
 		else
-#endif
-		SETCALC(Gate_next_ak);
+			SETCALC(Gate_next_ak);
 	}
 
 	unit->mLevel = 0.f;
@@ -1893,10 +1866,8 @@ void Phasor_next_aa(Phasor *unit, int inNumSamples)
 void Peak_next_ak_unroll(Peak *unit, int inNumSamples);
 void Peak_next_ai_unroll(Peak *unit, int inNumSamples);
 
-#ifdef NOVA_SIMD
 FLATTEN void Peak_next_ak_k_nova(Peak *unit, int inNumSamples);
 FLATTEN void Peak_next_ai_k_nova(Peak *unit, int inNumSamples);
-#endif
 
 void Peak_Ctor(Peak *unit)
 {
@@ -1906,23 +1877,15 @@ void Peak_Ctor(Peak *unit)
 		if (INRATE(1) == calc_FullRate) {
 			SETCALC(Peak_next_aa_k);
 		} else if (INRATE(1) == calc_ScalarRate) {
-#ifdef NOVA_SIMD
 			if (INBUFLENGTH(0) & 7)
 				SETCALC(Peak_next_ai_k);
 			else
 				SETCALC(Peak_next_ai_k_nova);
-#else
-			SETCALC(Peak_next_ai_k);
-#endif
         } else {
-#ifdef NOVA_SIMD
 			if (INBUFLENGTH(0) & 7)
 				SETCALC(Peak_next_ak_k);
 			else
 				SETCALC(Peak_next_ak_k_nova);
-#else
-				SETCALC(Peak_next_ak_k);
-#endif
 		}
 	} else {
 		if (INRATE(1) == calc_FullRate) {
@@ -2107,7 +2070,6 @@ void Peak_next_aa_k(Peak *unit, int inNumSamples)
 	unit->mLevel = level;
 }
 
-#ifdef NOVA_SIMD
 void Peak_next_ak_k_nova(Peak *unit, int inNumSamples)
 {
 	float *out = ZOUT(0);
@@ -2134,7 +2096,6 @@ void Peak_next_ai_k_nova(Peak *unit, int inNumSamples)
 	ZXP(out) = level;
 	unit->mLevel = level;
 }
-#endif
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 

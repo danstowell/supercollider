@@ -27,7 +27,6 @@
 #define hypotf _hypotf
 #endif
 
-#ifdef NOVA_SIMD
 #include "simd_binary_arithmetic.hpp"
 #include "simd_math.hpp"
 #include "simd_memory.hpp"
@@ -217,7 +216,6 @@ NOVA_SIMD_DEFINE_BINARY_WRAPPER (sc_sqrsum, sc_sqrsum_functor)
 NOVA_SIMD_DEFINE_BINARY_WRAPPER (sc_sqrdif, sc_sqrdif_functor)
 }
 
-#endif
 
 using namespace std; // for math functions
 
@@ -1600,12 +1598,10 @@ void firstarg_aa(BinaryOpUGen *unit, int inNumSamples)
 	ZCopy(inNumSamples, out, a);
 }
 
-#ifdef NOVA_SIMD
 FLATTEN void firstarg_aa_nova(BinaryOpUGen *unit, int inNumSamples)
 {
 	nova::copyvec_simd(OUT(0), IN(0), inNumSamples);
 }
-#endif
 
 void secondarg_aa(BinaryOpUGen *unit, int inNumSamples)
 {
@@ -1615,12 +1611,10 @@ void secondarg_aa(BinaryOpUGen *unit, int inNumSamples)
 	ZCopy(inNumSamples, out, b);
 }
 
-#ifdef NOVA_SIMD
 FLATTEN void secondarg_aa_nova(BinaryOpUGen *unit, int inNumSamples)
 {
 	nova::copyvec_simd(OUT(0), IN(1), inNumSamples);
 }
-#endif
 
 void add_aa(BinaryOpUGen *unit, int inNumSamples)
 {
@@ -1710,7 +1704,6 @@ void add_ai(BinaryOpUGen *unit, int inNumSamples)
 	unit->mPrevB = xb;
 }
 
-#ifdef NOVA_SIMD
 NOVA_BINARY_WRAPPER(add, plus)
 
 FLATTEN void add_ak_nova(BinaryOpUGen *unit, int inNumSamples)
@@ -1781,8 +1774,6 @@ FLATTEN void add_ka_nova_64(BinaryOpUGen *unit, int inNumSamples)
 		unit->mPrevA = next_a;
 	}
 }
-
-#endif
 
 
 
@@ -1876,7 +1867,6 @@ void sub_ai(BinaryOpUGen *unit, int inNumSamples)
 	unit->mPrevB = xb;
 }
 
-#ifdef NOVA_SIMD
 NOVA_BINARY_WRAPPER(sub, minus)
 
 FLATTEN void sub_ak_nova(BinaryOpUGen *unit, int inNumSamples)
@@ -1940,8 +1930,6 @@ FLATTEN void sub_ka_nova_64(BinaryOpUGen *unit, int inNumSamples)
 		unit->mPrevA = next_a;
 	}
 }
-
-#endif
 
 
 
@@ -2035,7 +2023,6 @@ void mul_ia(BinaryOpUGen *unit, int inNumSamples)
 	unit->mPrevA = xa;
 }
 
-#ifdef NOVA_SIMD
 NOVA_BINARY_WRAPPER(mul, times)
 
 FLATTEN void mul_ka_nova(BinaryOpUGen *unit, int inNumSamples)
@@ -2117,8 +2104,6 @@ FLATTEN void mul_ak_nova_64(BinaryOpUGen *unit, int inNumSamples)
 		nova::times_vec_simd(OUT(0), IN(0), slope_argument(xb, slope), inNumSamples);
 	}
 }
-
-#endif
 
 
 void div_aa(BinaryOpUGen *unit, int inNumSamples)
@@ -2211,7 +2196,6 @@ void div_ai(BinaryOpUGen *unit, int inNumSamples)
 	unit->mPrevB = xb;
 }
 
-#ifdef NOVA_SIMD
 FLATTEN void div_aa_nova(BinaryOpUGen *unit, int inNumSamples)
 {
 	nova::over_vec_simd(OUT(0), IN(0), IN(1), inNumSamples);
@@ -2270,8 +2254,6 @@ FLATTEN void div_ka_nova(BinaryOpUGen *unit, int inNumSamples)
 		unit->mPrevA = next_a;
 	}
 }
-
-#endif
 
 
 void idiv_aa(BinaryOpUGen *unit, int inNumSamples)
@@ -2531,9 +2513,7 @@ void max_ai(BinaryOpUGen *unit, int inNumSamples)
 	unit->mPrevB = xb;
 }
 
-#ifdef NOVA_SIMD
 NOVA_BINARY_WRAPPER_K(max, max)
-#endif
 
 
 
@@ -2625,9 +2605,7 @@ void min_ai(BinaryOpUGen *unit, int inNumSamples)
 }
 
 
-#ifdef NOVA_SIMD
 NOVA_BINARY_WRAPPER_K(min, min)
-#endif
 
 
 void and_aa(BinaryOpUGen *unit, int inNumSamples)
@@ -3540,7 +3518,6 @@ void pow_ai(BinaryOpUGen *unit, int inNumSamples)
 	unit->mPrevB = xb;
 }
 
-#ifdef NOVA_SIMD
 FLATTEN void pow_aa_nova(BinaryOpUGen *unit, int inNumSamples)
 {
 	nova::spow_vec_simd(OUT(0), IN(0), IN(1), inNumSamples);
@@ -3594,14 +3571,11 @@ FLATTEN void pow_ai_nova(BinaryOpUGen *unit, int inNumSamples)
 	float xb = ZIN0(1);
 	nova::spow_vec_simd(OUT(0), IN(0), xb, inNumSamples);
 }
-#endif
 
-#ifdef NOVA_SIMD
 NOVA_BINARY_WRAPPER(ring1, sc_ring1)
 NOVA_BINARY_WRAPPER(ring2, sc_ring2)
 NOVA_BINARY_WRAPPER(ring3, sc_ring3)
 NOVA_BINARY_WRAPPER(ring4, sc_ring4)
-#endif
 
 
 void ring1_aa(BinaryOpUGen *unit, int inNumSamples)
@@ -4187,9 +4161,7 @@ void clip2_ai(BinaryOpUGen *unit, int inNumSamples)
 }
 
 
-#ifdef NOVA_SIMD
 NOVA_BINARY_WRAPPER_K(clip2, clip2)
-#endif
 
 
 void excess_aa(BinaryOpUGen *unit, int inNumSamples)
@@ -4490,9 +4462,7 @@ void lt_aa(BinaryOpUGen *unit, int inNumSamples)
 	);
 }
 
-#ifdef NOVA_SIMD
 NOVA_BINARY_WRAPPER_K(lt, less)
-#endif
 
 
 void lt_ak(BinaryOpUGen *unit, int inNumSamples)
@@ -4583,9 +4553,7 @@ void le_aa(BinaryOpUGen *unit, int inNumSamples)
 	);
 }
 
-#ifdef NOVA_SIMD
 NOVA_BINARY_WRAPPER_K(le, less_equal)
-#endif
 
 void le_ak(BinaryOpUGen *unit, int inNumSamples)
 {
@@ -4675,9 +4643,7 @@ void gt_aa(BinaryOpUGen *unit, int inNumSamples)
 	);
 }
 
-#ifdef NOVA_SIMD
 NOVA_BINARY_WRAPPER_K(gt, greater)
-#endif
 
 
 void gt_ak(BinaryOpUGen *unit, int inNumSamples)
@@ -4768,9 +4734,7 @@ void ge_aa(BinaryOpUGen *unit, int inNumSamples)
 	);
 }
 
-#ifdef NOVA_SIMD
 NOVA_BINARY_WRAPPER_K(ge, greater_equal)
-#endif
 
 
 void ge_ak(BinaryOpUGen *unit, int inNumSamples)
@@ -4861,9 +4825,7 @@ void eq_aa(BinaryOpUGen *unit, int inNumSamples)
 	);
 }
 
-#ifdef NOVA_SIMD
 NOVA_BINARY_WRAPPER_K(eq, equal)
-#endif
 
 void eq_ak(BinaryOpUGen *unit, int inNumSamples)
 {
@@ -4953,9 +4915,7 @@ void neq_aa(BinaryOpUGen *unit, int inNumSamples)
 	);
 }
 
-#ifdef NOVA_SIMD
 NOVA_BINARY_WRAPPER_K(neq, notequal)
-#endif
 
 
 void neq_ak(BinaryOpUGen *unit, int inNumSamples)
@@ -5031,12 +4991,10 @@ void neq_ai(BinaryOpUGen *unit, int inNumSamples)
 	unit->mPrevB = xb;
 }
 
-#ifdef NOVA_SIMD
 NOVA_BINARY_WRAPPER_K(sumsqr, sc_sumsqr)
 NOVA_BINARY_WRAPPER_K(difsqr, sc_difsqr)
 NOVA_BINARY_WRAPPER_K(sqrsum, sc_sqrsum)
 NOVA_BINARY_WRAPPER_K(sqrdif, sc_sqrdif)
-#endif
 
 void sumsqr_aa(BinaryOpUGen *unit, int inNumSamples)
 {
@@ -6617,7 +6575,6 @@ static BinaryOpFunc ChooseNormalFunc(BinaryOpUGen *unit)
 	return func;
 }
 
-#ifdef NOVA_SIMD
 static BinaryOpFunc ChooseNovaSimdFunc_64(BinaryOpUGen *unit)
 {
 	BinaryOpFunc func = &zero_1;
@@ -7214,8 +7171,6 @@ static BinaryOpFunc ChooseNovaSimdFunc(BinaryOpUGen *unit)
 	return func;
 }
 
-#endif
-
 bool ChooseOperatorFunc(BinaryOpUGen *unit)
 {
 	//Print("->ChooseOperatorFunc %d\n", unit->mSpecialIndex);
@@ -7228,7 +7183,6 @@ bool ChooseOperatorFunc(BinaryOpUGen *unit)
 		} else {
 			func = ChooseOneSampleFunc(unit);
 		}
-#if defined(NOVA_SIMD)
 	} else if (!(BUFLENGTH & 15)) {
 		/* select normal function for initialization */
 		func = ChooseNormalFunc(unit);
@@ -7237,7 +7191,6 @@ bool ChooseOperatorFunc(BinaryOpUGen *unit)
 		/* select simd function */
 		func = ChooseNovaSimdFunc(unit);
 		ret = true;
-#endif
 	} else {
 		func = ChooseNormalFunc(unit);
 	}
